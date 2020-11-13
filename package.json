@@ -1,0 +1,28 @@
+{
+  "name": "yt-node",
+  "version": "1.0.0",
+  "description": "Download videos from youtube on bulk with node",
+  "main": "index.js",
+  "scripts": {
+    "test": "blk --t"
+  },
+  "author": "Jorge Sidgo Pimentel",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^6.2.0",
+    "cors": "^2.8.5",
+    "cowsay": "^1.4.0",
+    "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "line-reader": "^0.4.0",
+    "ora": "^5.1.0",
+    "qrcode-terminal": "^0.12.0",
+    "rxjs": "^6.6.3",
+    "sulla": "^2.3.14",
+    "sulla-hotfix": "^1.8.42",
+    "video-converter": "^1.0.0",
+    "whatsapp-chat-parser": "^3.0.2",
+    "whatsapp-web.js": "^1.11.0",
+    "ytdl-core": "^4.0.3"
+  }
+}
