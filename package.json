@@ -9,6 +9,7 @@
   "author": "Jorge Sidgo Pimentel",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.4.0",
     "commander": "^6.2.0",
     "cors": "^2.8.5",
     "cowsay": "^1.4.0",
@@ -23,6 +24,8 @@
     "video-converter": "^1.0.0",
     "whatsapp-chat-parser": "^3.0.2",
     "whatsapp-web.js": "^1.11.0",
-    "ytdl-core": "^4.0.3"
+    "youtube-playlist": "^1.0.4",
+    "ytdl-core": "^4.1.6",
+    "ytpl": "^2.0.3"
   }
 }

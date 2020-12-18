@@ -1,53 +1,114 @@
+const readline = require('readline');
+const downloader = require('./downloader');
+const ora = require('ora');
+const spinner = ora('');
+const utils = require('./utils');
 const fs = require('fs')
-const readline = require('readline')
-const downloader = require('./downloader')
-const ora = require('ora')
-const spinner = ora('')
+const ytlist = require('youtube-playlist');
+const ytpl = require('ytpl');
 
 module.exports = {
 
-    download: function (path) {
-
+    fileDownload: (path, sourceFile) => {
         return new Promise(async (resolve, reject) => {
+            utils.createPath(path)
 
-            spinner.color = 'green'
-            spinner.text = '[Descargando]'
-            let paths = []
-
-            const file = fs.createReadStream(path)
+            const file = fs.createReadStream(sourceFile)
 
             const rl = readline.createInterface({
                 input: file,
                 crlfDelay: Infinity
             })
 
-            let counter = 57
+            counter = 378
 
             for await (const line of rl) {
 
-                if(line == 'STOP') {
+                if (line == 'STOP') {
                     spinner.succeed('[Descarga finalizada] ')
-                    resolve(paths)
                 } else {
-                    let res;
+                    let item;
                     try {
                         let currentLink = line.replace(',', '')
+
+                        if (counter === 1) {
+                            setTimeout(() => {
+                                spinner.text = `[Descargando] - ${counter} - ${currentLink}`
+                                spinner.start()
+                            }, 500);
+                        } else {
+                            spinner.text = `[Descargando] - ${counter} - ${currentLink}`
+                            spinner.start()
+                        }
+
+                        item = await downloader.download(currentLink, counter, path).catch(e => {
+                            utils.appendToFile(currentLink, 'failed');
+                            spinner.fail('[Error al descargar] ' + JSON.stringify(e))
+                            reject(e)
+                        })
+
+                        spinner.succeed(`[Descargado] - ${counter} - ${item}`)
+                        counter++
+                    } catch (e) {
+                        spinner.fail('[Error al descargar] ' + e)
+                        utils.appendToFile(currentLink, 'failed');
+                        reject(e)
+                    }
+
+                }
+            }
+        })
+
+    },
+
+    playlistDownload: (path, listLink) => {
+        return new Promise(async (resolve, reject) => {
+
+            utils.createPath(path)
+
+            const pl = await ytpl(listLink, {
+                limit: Infinity
+            });
+
+            let links = pl.items.map(x => x.shortUrl);
+
+            counter = 1
+
+            for await (let link of links) {
+                let item;
+                try {
+                    let currentLink = link
+
+                    if (counter === 1) {
+                        setTimeout(() => {
+                            spinner.text = `[Descargando] - ${counter} - ${currentLink}`
+                            spinner.start()
+                        }, 500);
+                    } else {
                         spinner.text = `[Descargando] - ${counter} - ${currentLink}`
                         spinner.start()
-                        res = await downloader.download(line.replace(',', ''), counter)
-                        spinner.succeed(`[Descargado] - ${counter} - ${res}`)
-                        counter++
-                    } catch(e) {
-                        spinner.fail('[Error al descargar] ' + e[1])
-                        reject(e[0])
                     }
-                    
+
+                    item = await downloader.download(currentLink, counter, path).catch(e => {
+                        utils.appendToFile(currentLink, 'failedFromList');
+                        spinner.fail('[Error al descargar] ' + JSON.stringify(e))
+                        reject(e)
+                    })
+
+                    spinner.succeed(`[Descargado] - ${counter} - ${item}`)
+                    counter++
+                } catch (e) {
+                    spinner.fail('[Error al descargar] ' + e)
+                    utils.appendToFile(currentLink, 'failedFromList');
+                    reject(e)
                 }
 
 
-                
             }
         })
+    },
+
+    failedDownloads: (link, title) => {
 
     }
 }
